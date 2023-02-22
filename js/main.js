@@ -28,7 +28,7 @@ function build_scatter_plot() {
       .range([VIS_HEIGHT, MARGINS.top]);
 
     function handleClick(d) {
-      const X_POINT = Math.round(((d.x-350)/40));
+      const X_POINT = Math.round((d.x-305)/40);
       const Y_POINT = Math.round(10 - ((d.y-(MARGINS.top + MARGINS.bottom))/40));
       const clickedCircle = d3.select(this);
       if (clickedCircle.classed("selected")) {
