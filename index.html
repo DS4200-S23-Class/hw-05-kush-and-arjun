@@ -3,11 +3,74 @@
 
 <head>
     <meta charset=utf-8/>
+    <link rel="stylesheet" href="style.css">
+    <script src='js/d3.v6.1.1/d3.min.js'></script>
+    <title>hw-05</title>
 </head>
 
 
 <body>
+    <h1 class="centered"> hw-05: Interactive Graph with D3</h1>
 
+    <div class="flexrow"> 
+        <div class= "centered" id="flexcolumn1">
+            <div id="vis1"></div>
+        </div>
+
+        <div id="flexcolumn2">
+            <div id="new_text"></div>
+            <div>
+                <label>Select the x coordinate for the point you want to add.</label>
+                <select id="x-val">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                    <option>9</option>
+            </select>
+            </div>
+
+            <div>
+                <label>Select the y coordinate for the point you want to add.</label>
+                <select id="y-val">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                    <option>9</option>
+                </select>
+            </div>
+
+            <button type="button" id="subButton">Add Point</button>
+        </div>
+    </div>
+
+
+
+
+
+
+    <h2 class="centered">Acknowledgements</h1>
+            <div id="small_font"> 
+                <ul>
+                    <li>w3schools</li>
+                    <li>css-tricks</li>
+                    <li>stackoverflow</li>
+                    <li>java2s</li>
+                    <li>geeksforgeeks</li>
+                </ul>
+
+            </div>
+
+    <script src="js/main.js"></script>
 
 </body>
 
