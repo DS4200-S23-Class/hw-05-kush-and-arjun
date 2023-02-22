@@ -21,7 +21,7 @@ function build_scatter_plot() {
 
     const X_SCALE = d3.scaleLinear()
       .domain([0, MAX_X])
-      .range([MARGINS.bottom, VIS_WIDTH]);
+      .range([MARGINS.left, VIS_WIDTH]);
 
     const Y_SCALE = d3.scaleLinear()
       .domain([0, MAX_Y])
@@ -29,7 +29,7 @@ function build_scatter_plot() {
 
     function handleClick(d) {
       console.log(d.x)
-      let X_POINT = Math.round((d.x-345)/40);
+      let X_POINT = Math.round(((d.x-(MARGINS.left + MARGINS.right))/40)-6);
       let Y_POINT = Math.round(10 - ((d.y-(MARGINS.top + MARGINS.bottom))/40));
       const clickedCircle = d3.select(this);
       if (clickedCircle.classed("selected")) {
