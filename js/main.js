@@ -15,21 +15,21 @@ const FRAME1 = d3.select("#vis1")
 function build_scatter_plot() {
   /// Load data from CSV
   d3.csv("data/scatter-data.csv").then((data) => {
-    // Define scales for x and y axes
+    // Finding MAX X and Y values
     const MAX_X = d3.max(data, (d) => { return parseInt(d.x); });
     const MAX_Y = d3.max(data, (d) => { return parseInt(d.y); });
 
-    const X_Scale = d3.scaleLinear()
+    const X_SCALE = d3.scaleLinear()
       .domain([0, MAX_X])
       .range([MARGINS.bottom, VIS_WIDTH]);
 
-    const Y_Scale = d3.scaleLinear()
+    const Y_SCALE = d3.scaleLinear()
       .domain([0, MAX_Y])
       .range([VIS_HEIGHT, MARGINS.top]);
 
     function handleClick(d) {
-      const X_POINT = Math.round(((d.x-115)/40));
-      const Y_POINT = Math.round(10 - ((d.y-80)/40));
+      const X_POINT = Math.round(((d.x-310)/40));
+      const Y_POINT = Math.round(10 - ((d.y-(MARGINS.top + MARGINS.bottom))/40));
       const clickedCircle = d3.select(this);
       if (clickedCircle.classed("selected")) {
         clickedCircle.classed("selected", false);
@@ -44,25 +44,25 @@ function build_scatter_plot() {
     // Add x-axis
     FRAME1.append("g") 
           .attr("transform", "translate(" + 0 + "," + (VIS_HEIGHT) + ")") 
-          .call(d3.axisBottom(X_Scale)) 
+          .call(d3.axisBottom(X_SCALE)) 
           .attr("class", "axes-font"); 
 
     // Add y-axis
     FRAME1.append("g") 
           .attr("transform", "translate(" + MARGINS.bottom + "," + 0 + ")") 
-          .call(d3.axisLeft(Y_Scale)) 
+          .call(d3.axisLeft(Y_SCALE)) 
           .attr("class", "axes-font");
 
     FRAME1.selectAll("points")
       .data(data)
       .enter()
       .append("circle")
-        .attr("cx", function(d) { return X_Scale(d.x); })
-        .attr("cy", function(d) { return Y_Scale(d.y); })
+        .attr("cx", function(d) { return X_SCALE(d.x); })
+        .attr("cy", function(d) { return Y_SCALE(d.y); })
         .attr("class", "point")
         .on("click", handleClick);
         
-    // add 
+    // add button control eventlistener to redraw plots
     d3.select("#subButton")
          .on("click", function() {
                     // Get the values from the dropdown list
@@ -81,15 +81,106 @@ function build_scatter_plot() {
                     .data(data)
                     .enter()
                     .append("circle")
-                      .attr("cx", function(d) { return X_Scale(d.x); })
-                      .attr("cy", function(d) { return Y_Scale(d.y); })
+                      .attr("cx", function(d) { return X_SCALE(d.x); })
+                      .attr("cy", function(d) { return Y_SCALE(d.y); })
                       .attr("class", "point")
                       .on("click", handleClick);         
 
                     });
-
   });
 };
 
+// draws scatter splot
 build_scatter_plot()
 
+
+
+
+// building bar chart
+const FRAME2 = d3.select("#vis2") 
+                  .append("svg") 
+                  .attr("height", FRAME_HEIGHT)   
+                  .attr("width", FRAME_WIDTH)
+                  .attr("class", "frame");
+
+function build_bar_chart() {
+  /// Load data from CSV
+  d3.csv("data/bar-data.csv").then((data) => {
+    const MAX_X = d3.max(data, (d) => { return parseInt(d.x); });
+    const MAX_Y = d3.max(data, (d) => { return parseInt(d.y); });
+
+  
+      // Set the ranges and scales for the x-axis and y-axis
+      const X_Scale = d3.scaleBand()
+                .range([MARGINS.left, VIS_WIDTH])
+                .padding(0.3);
+      const Y_Scale = d3.scaleLinear()
+                .range([VIS_HEIGHT, MARGINS.top]);
+
+      // Map the data to the x and y domains
+      X_Scale.domain(data.map(function(d) { return d.category; }));
+      Y_Scale.domain([0, d3.max(data, function(d) { return +d.amount; })+1]);
+
+      // Add x-axis
+    FRAME2.append("g") 
+          .attr("transform", "translate(" + 0 + "," + (VIS_HEIGHT+MARGINS.top) + ")") 
+          .call(d3.axisBottom(X_Scale)) 
+          .attr("class", "axes-font"); 
+
+    // Add y-axis
+    FRAME2.append("g") 
+          .attr("transform", "translate(" + MARGINS.left + "," + MARGINS.top + ")") 
+          .call(d3.axisLeft(Y_Scale)) 
+          .attr("class", "axes-font");
+
+      // Add the bars to the chart
+      FRAME2.selectAll(".bar")
+          .data(data)
+          .enter().append("rect")
+          .attr("class", "bar")
+          .attr("x", function(d) { return X_Scale(d.category); })
+         .attr("y", function(d) { return Y_Scale(d.amount) + MARGINS.top; })
+         .attr("width", X_Scale.bandwidth())
+         .attr("height", function(d) { return VIS_HEIGHT - Y_Scale(d.amount); });
+
+
+         // Tooltip
+
+     // To add a tooltip, we will need a blank div that we 
+    //  fill in with the appropriate text. Be use to note the
+    //  styling we set here and in the .css
+    const TOOLTIP = d3.select("#vis2")
+                        .append("div")
+                          .attr("class", "tooltip")
+                          .style("opacity", 0); 
+
+    // Define event handler functions for tooltips
+    function handleMouseover(event, d) {
+      // on mouseover, make opaque 
+      TOOLTIP.style("opacity", 1); 
+      
+    }
+
+    function handleMousemove(event, d) {
+      // position the tooltip and fill in information 
+      TOOLTIP.html("Category: " + d.category + "<br>Amount: " + d.amount)
+              .style("left", (event.pageX + 10) + "px") //add offset from mouse
+              .style("top", (event.pageY - 50) + "px"); 
+    }
+
+    function handleMouseleave(event, d) {
+      // on mouseleave, make transparant again 
+      TOOLTIP.style("opacity", 0); 
+    } 
+
+    // Add event listeners
+    FRAME2.selectAll(".bar")
+          .on("mouseover", handleMouseover) //add event listeners
+          .on("mousemove", handleMousemove)
+          .on("mouseleave", handleMouseleave);
+          // Add the mouseover event for the tooltip
+  });
+};
+
+//
+build_bar_chart()
