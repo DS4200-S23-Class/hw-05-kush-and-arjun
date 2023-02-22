@@ -20,3 +20,31 @@ body {
 #flexcolumn2 {
   flex: 40%;
 }
+
+.point {
+  fill: mediumpurple;
+  r: 10;
+}
+
+.point:hover {
+  fill: orange;
+}
+
+
+.selected {
+  stroke: mediumseagreen;
+  stroke-width: 4px;
+}
+
+.axes-font {
+    font-size: 15px;
+}
+
+.tooltip {
+  position: absolute;
+  background-color: #fff;
+  padding: 8px;
+  border: 1px solid #ccc;
+  pointer-events: none;
+  font-size: 12px;
+    }

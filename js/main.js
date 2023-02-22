@@ -8,55 +8,88 @@ const VIS_WIDTH = FRAME_WIDTH - MARGINS.left - MARGINS.right;
 
 const FRAME1 = d3.select("#vis1") 
                   .append("svg") 
-                    .attr("height", FRAME_HEIGHT)   
-                    .attr("width", FRAME_WIDTH)
-                    .attr("class", "frame"); 
+                  .attr("height", FRAME_HEIGHT)   
+                  .attr("width", FRAME_WIDTH)
+                  .attr("class", "frame"); 
 
-/// Load data from CSV
-d3.csv("data/scatter-data.csv").then((data) => {
- // Define scales for x and y axes
-  const MIN_X = d3.min(data, (d) => { return parseInt(d.x); });
-  const MIN_Y = d3.min(data, (d) => { return parseInt(d.y); });
+function build_scatter_plot() {
+  /// Load data from CSV
+  d3.csv("data/scatter-data.csv").then((data) => {
+    // Define scales for x and y axes
+    const MAX_X = d3.max(data, (d) => { return parseInt(d.x); });
+    const MAX_Y = d3.max(data, (d) => { return parseInt(d.y); });
 
-  const MAX_X = d3.max(data, (d) => { return parseInt(d.x); });
-  const MAX_Y = d3.max(data, (d) => { return parseInt(d.y); });
+    const X_Scale = d3.scaleLinear()
+      .domain([0, MAX_X])
+      .range([MARGINS.bottom, VIS_WIDTH]);
 
-  console.log(MAX_X)
-  console.log(MAX_Y)
+    const Y_Scale = d3.scaleLinear()
+      .domain([0, MAX_Y])
+      .range([VIS_HEIGHT, MARGINS.top]);
 
+    function handleClick(d) {
+      const X_POINT = Math.round(((d.x-115)/40));
+      const Y_POINT = Math.round(10 - ((d.y-80)/40));
+      const clickedCircle = d3.select(this);
+      if (clickedCircle.classed("selected")) {
+        clickedCircle.classed("selected", false);
+        d3.select("#new_text").text(`Selected point: (${X_POINT}, ${Y_POINT})`);
+      } 
+      else {
+          clickedCircle.classed("selected", true);
+          d3.select("#new_text").text(`Selected point: (${X_POINT}, ${Y_POINT})`);
+        }
+      }
 
-  const xScale = d3.scaleLinear()
-    .domain([0, MAX_X])
-    .range([MARGINS.left, VIS_WIDTH]);
+    // Add x-axis
+    FRAME1.append("g") 
+          .attr("transform", "translate(" + 0 + "," + (VIS_HEIGHT) + ")") 
+          .call(d3.axisBottom(X_Scale)) 
+          .attr("class", "axes-font"); 
 
-  const yScale = d3.scaleLinear()
-    .domain([0, MAX_Y])
-    .range([VIS_HEIGHT, MARGINS.top]);
+    // Add y-axis
+    FRAME1.append("g") 
+          .attr("transform", "translate(" + MARGINS.bottom + "," + 0 + ")") 
+          .call(d3.axisLeft(Y_Scale)) 
+          .attr("class", "axes-font");
 
-  console.log(xScale(1))
-  console.log(yScale(2))
+    FRAME1.selectAll("points")
+      .data(data)
+      .enter()
+      .append("circle")
+        .attr("cx", function(d) { return X_Scale(d.x); })
+        .attr("cy", function(d) { return Y_Scale(d.y); })
+        .attr("class", "point")
+        .on("click", handleClick);
+        
+    // add 
+    d3.select("#subButton")
+         .on("click", function() {
+                    // Get the values from the dropdown list
+                    let newX = d3.select("#x-val").property("value");
+                    let newY = d3.select("#y-val").property("value");
 
+                    // Create a new point object
+                    const newPoint = {x: newX, y: newY}
 
-  // Add x-axis
-  FRAME1.append("g") 
-        .attr("transform", "translate(" + MARGINS.left + 
-              "," + (VIS_HEIGHT + MARGINS.right) + ")") 
-        .call(d3.axisBottom(xScale)) 
-          .attr("font-size", '20px'); 
+                    data.push(newPoint);
+                    console.log(data);
 
-  // Add y-axis
-  FRAME1.append("g") 
-        .attr("transform", "translate(" + MARGINS.bottom + 
-              "," + MARGINS.top + ")") 
-        .call(d3.axisLeft(yScale)) 
-          .attr("font-size", '20px');
+                    FRAME1.selectAll(".point").remove();
 
-  FRAME1.selectAll("dot")
-    .data(data)
-    .enter()
-    .append("circle")
-      .attr("cx", function(d) { return xScale(d.x); })
-      .attr("cy", function(d) { return yScale(d.y); })
-      .attr("r", 5)
-      .attr("fill", "steelblue");
-});
+                    FRAME1.selectAll("points.new")
+                    .data(data)
+                    .enter()
+                    .append("circle")
+                      .attr("cx", function(d) { return X_Scale(d.x); })
+                      .attr("cy", function(d) { return Y_Scale(d.y); })
+                      .attr("class", "point")
+                      .on("click", handleClick);         
+
+                    });
+
+  });
+};
+
+build_scatter_plot()
+
