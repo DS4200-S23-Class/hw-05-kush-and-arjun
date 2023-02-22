@@ -29,7 +29,7 @@ function build_scatter_plot() {
 
     function handleClick(d) {
       console.log(d.x)
-      let X_POINT = Math.round((d.x-345)/40).abs();
+      let X_POINT = Math.abs.round((d.x-345)/40);
       let Y_POINT = Math.round(10 - ((d.y-(MARGINS.top + MARGINS.bottom))/40));
       const clickedCircle = d3.select(this);
       if (clickedCircle.classed("selected")) {
